@@ -8,6 +8,11 @@ int main(void) {
   printf("C HOST: Sending URL to Rust worker...\n");
 
   ParsedUrl url = parse_url(target_url);
+  if (url.host == NULL || url.path == NULL) {
+    fprintf(stderr, "C HOST: Failed to parse URL.\n");
+    free_parsed_url(&url);
+    return 1;
+  }
 
   char *html = fetch_html(url.host, url.path);
   if (html == NULL) {
