@@ -12,6 +12,6 @@ FetchContent_MakeAvailable(Corrosion)
 
 corrosion_import_crate(MANIFEST_PATH core_parser/Cargo.toml)
 
-add_executable(browser src/main.c)
+add_executable(browser src/main.c src/fetch.c)
 
 target_link_libraries(browser PRIVATE core_parser)
