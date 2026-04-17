@@ -7,7 +7,7 @@ pub struct ParsedUrl {
     pub path: *mut c_char,
 }
 
-/// no_mangle allows c to find function by name
+/// no_mangle allows C to find function by name
 // TODO: update url parameter
 #[unsafe(no_mangle)]
 pub extern "C" fn parse_url(_url: *const c_char) -> ParsedUrl {
