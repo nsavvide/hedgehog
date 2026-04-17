@@ -78,6 +78,11 @@ char *fetch_html(const char *hostname, const char *path) {
   /* TODO: Make response allocation dynamic */
   int buffer_size = 8192;
   char *response = malloc(buffer_size);
+  if (response == NULL) {
+    fprintf(stderr, "Error: Could not allocate response buffer\n");
+    close(fd);
+    return NULL;
+  }
   memset(response, 0, buffer_size);
 
   read(fd, response, buffer_size - 1);
