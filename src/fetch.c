@@ -1,3 +1,4 @@
+#include "fetch.h"
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -73,6 +74,7 @@ char *fetch_html(const char *hostname, const char *path) {
     return NULL;
   }
 
+  // TODO: Could create a partial write
   write(fd, request, (size_t)request_len);
   free(request);
   /* TODO: Make response allocation dynamic */
