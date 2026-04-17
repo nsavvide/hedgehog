@@ -1,7 +1,7 @@
 #include "rust_bridge.h"
 #include <stdio.h>
 
-int main() {
+int main(void) {
   const char *target_url = "http://cracked-dev.com/engine.html";
 
   printf("C HOST: Sending URL to Rust worker...\n");
