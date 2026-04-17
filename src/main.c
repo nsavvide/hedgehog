@@ -1,3 +1,4 @@
+#include "fetch.h"
 #include "rust_bridge.h"
 #include <stdio.h>
 
@@ -8,13 +9,15 @@ int main() {
 
   ParsedUrl url = parse_url(target_url);
 
-  printf("C HOST: Received parsed data!\n");
-  printf("  -> Host: %s\n", url.host);
-  printf("  -> Path: %s\n", url.path);
+  char *html = fetch_html(url.host, url.path);
+  if (html == NULL) {
+    fprintf(stderr, "C HOST: Failed to fetch HTML content.\n");
+    free_parsed_url(url);
+    return 1;
+  }
 
-  printf("C HOST: Returning memory to Rust for cleanup...\n");
+  printf("Received:\n %s\n", html);
+
   free_parsed_url(url);
-
-  printf("C HOST: Success. Exiting.\n");
   return 0;
 }
