@@ -2,8 +2,8 @@
 #define RUST_BRIDGE_H
 
 typedef struct {
-  char *host;
-  char *path;
+  const char *host;
+  const char *path;
 } ParsedUrl;
 
 ParsedUrl parse_url(const char *raw_url);
