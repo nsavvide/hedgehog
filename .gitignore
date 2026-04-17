@@ -1,0 +1,44 @@
+# =========================
+# 1. CMake Build Artifacts
+# =========================
+/build/
+/build-*/
+
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+
+# =========================
+# 2. Rust & Cargo Artifacts
+# =========================
+/core_parser/target/
+
+# Ignore Cargo lock files if you only want to rely on the toml (Optional, but common for libs)
+# /core_parser/Cargo.lock 
+
+# Rust backup files
+**/*.rs.bk
+
+# =========================
+# 3. C Compiled Binaries
+# =========================
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+
+# =========================
+# 4. OS & Editor Files
+# =========================
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
