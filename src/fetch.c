@@ -80,13 +80,45 @@ char *fetch_html(const char *hostname, const char *path) {
   char *response = malloc(buffer_size);
   if (response == NULL) {
     fprintf(stderr, "Error: Could not allocate response buffer\n");
+  size_t buffer_size = 8192;
+  size_t total_read = 0;
+  ssize_t bytes_read;
+  char *response = malloc(buffer_size);
+  if (response == NULL) {
+    fprintf(stderr, "Error: Could not allocate response buffer\n");
     close(fd);
     return NULL;
   }
-  memset(response, 0, buffer_size);
 
-  read(fd, response, buffer_size - 1);
+  while (1) {
+    if (total_read == buffer_size - 1) {
+      size_t new_buffer_size = buffer_size * 2;
+      char *new_response = realloc(response, new_buffer_size);
+      if (new_response == NULL) {
+        fprintf(stderr, "Error: Could not grow response buffer\n");
+        free(response);
+        close(fd);
+        return NULL;
+      }
+      response = new_response;
+      buffer_size = new_buffer_size;
+    }
 
+    bytes_read = read(fd, response + total_read, buffer_size - total_read - 1);
+    if (bytes_read <= 0) {
+      break;
+    }
+    total_read += (size_t)bytes_read;
+  }
+
+  if (bytes_read < 0) {
+    fprintf(stderr, "Error: Could not read response\n");
+    free(response);
+    close(fd);
+    return NULL;
+  }
+
+  response[total_read] = '\0';
   close(fd);
   return response;
 }
