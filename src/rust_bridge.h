@@ -7,6 +7,6 @@ typedef struct {
 } ParsedUrl;
 
 ParsedUrl parse_url(const char *raw_url);
-void free_parsed_url(ParsedUrl url);
+void free_parsed_url(ParsedUrl *url);
 
 #endif // RUST_BRIDGE_H

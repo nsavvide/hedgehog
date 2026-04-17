@@ -13,7 +13,7 @@ int main(void) {
   printf("  -> Path: %s\n", url.path);
 
   printf("C HOST: Returning memory to Rust for cleanup...\n");
-  free_parsed_url(url);
+  free_parsed_url(&url);
 
   printf("C HOST: Success. Exiting.\n");
   return 0;

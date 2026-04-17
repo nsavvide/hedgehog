@@ -21,13 +21,22 @@ pub extern "C" fn parse_url(_url: *const c_char) -> ParsedUrl {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn free_parsed_url(parsed_url: ParsedUrl) {
+pub unsafe extern "C" fn free_parsed_url(parsed_url_ptr: *mut ParsedUrl) {
+    if parsed_url_ptr.is_null() {
+        return;
+    }
+
     unsafe {
+        let parsed_url = &mut *parsed_url_ptr;
+
         if !parsed_url.host.is_null() {
-            let _ = CString::from_raw(parsed_url.host); // Reclaim ownership to free memory
+            let _ = CString::from_raw(parsed_url.host); // Reclaim and free
+            parsed_url.host = std::ptr::null_mut(); // Null out to prevent double-free
         }
+
         if !parsed_url.path.is_null() {
-            let _ = CString::from_raw(parsed_url.path); // Reclaim ownership to free memory
+            let _ = CString::from_raw(parsed_url.path); // Reclaim and free
+            parsed_url.path = std::ptr::null_mut(); // Null out to prevent double-free
         }
     }
 }
