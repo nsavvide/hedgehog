@@ -44,15 +44,37 @@ char *fetch_html(const char *hostname, const char *path) {
     return NULL;
   }
 
-  char request[512];
-  snprintf(request, sizeof(request),
-           "GET %s HTTP/1.1\r\n"
-           "Host: %s\r\n"
-           "Connection: close\r\n\r\n",
-           path, hostname);
+  int request_len = snprintf(NULL, 0,
+                             "GET %s HTTP/1.1\r\n"
+                             "Host: %s\r\n"
+                             "Connection: close\r\n\r\n",
+                             path, hostname);
+  if (request_len < 0) {
+    fprintf(stderr, "Error: Could not format request\n");
+    close(fd);
+    return NULL;
+  }
 
-  write(fd, request, strlen(request));
+  char *request = malloc((size_t)request_len + 1);
+  if (request == NULL) {
+    fprintf(stderr, "Error: Could not allocate request buffer\n");
+    close(fd);
+    return NULL;
+  }
 
+  if (snprintf(request, (size_t)request_len + 1,
+               "GET %s HTTP/1.1\r\n"
+               "Host: %s\r\n"
+               "Connection: close\r\n\r\n",
+               path, hostname) != request_len) {
+    fprintf(stderr, "Error: Could not format request\n");
+    free(request);
+    close(fd);
+    return NULL;
+  }
+
+  write(fd, request, (size_t)request_len);
+  free(request);
   /* TODO: Make response allocation dynamic */
   int buffer_size = 8192;
   char *response = malloc(buffer_size);
