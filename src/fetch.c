@@ -6,27 +6,41 @@
 #include <unistd.h>
 
 char *fetch_html(const char *hostname, const char *path) {
-  struct hostent *server = gethostbyname(hostname);
-  if (server == NULL) {
-    fprintf(stderr, "Error: Could not resolve hostname %s\n", hostname);
+  struct addrinfo hints;
+  struct addrinfo *result;
+  struct addrinfo *rp;
+  int fd = -1;
+  int gai_status;
+
+  memset(&hints, 0, sizeof(hints));
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
+
+  gai_status = getaddrinfo(hostname, "80", &hints, &result);
+  if (gai_status != 0) {
+    fprintf(stderr, "Error: Could not resolve hostname %s: %s\n", hostname,
+            gai_strerror(gai_status));
     return NULL;
   }
 
-  int fd = socket(AF_INET, SOCK_STREAM, 0);
-  if (fd < 0) {
-    fprintf(stderr, "Error: Could not create socket\n");
-    return NULL;
-  }
+  for (rp = result; rp != NULL; rp = rp->ai_next) {
+    fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+    if (fd < 0) {
+      continue;
+    }
 
-  struct sockaddr_in server_addr;
-  memset(&server_addr, 0, sizeof(server_addr));
-  server_addr.sin_family = AF_INET;
-  server_addr.sin_port = htons(80);
-  memcpy(&server_addr.sin_addr.s_addr, server->h_addr, server->h_length);
+    if (connect(fd, rp->ai_addr, rp->ai_addrlen) == 0) {
+      break;
+    }
 
-  if (connect(fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
-    fprintf(stderr, "Error: Could not connect to server\n");
     close(fd);
+    fd = -1;
+  }
+
+  freeaddrinfo(result);
+
+  if (fd < 0) {
+    fprintf(stderr, "Error: Could not connect to server\n");
     return NULL;
   }
 
